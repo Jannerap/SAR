@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Calendar as CalendarIcon, Plus, AlertTriangle, Clock, FileText } from 'lucide-react';
 import axios from 'axios';
 
@@ -28,14 +28,10 @@ const Calendar: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCalendarEvents();
-  }, [currentDate]);
-
-  useEffect(() => {
     console.log('Events state updated:', events);
   }, [events]);
 
-  const fetchCalendarEvents = async () => {
+  const fetchCalendarEvents = useCallback(async () => {
     try {
       setLoading(true);
       const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
@@ -137,9 +133,11 @@ const Calendar: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentDate]);
 
-  const loadSampleEvents = () => {
+
+
+  const loadSampleEvents = useCallback(() => {
     const sampleEvents: CalendarEvent[] = [
       {
         id: 1,
@@ -179,7 +177,11 @@ const Calendar: React.FC = () => {
       }
     ];
     setEvents(sampleEvents);
-  };
+  }, [currentDate]);
+
+  useEffect(() => {
+    fetchCalendarEvents();
+  }, [fetchCalendarEvents]);
 
   const getCalendarDays = (): CalendarDay[] => {
     const year = currentDate.getFullYear();
