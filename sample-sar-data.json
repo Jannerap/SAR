@@ -1,0 +1,56 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2024-08-17T06:00:00Z",
+    "description": "Sample SAR data for testing the system"
+  },
+  "sar_cases": [
+    {
+      "id": 1,
+      "case_reference": "SAR-2024-001",
+      "organization_name": "Tech Corp Ltd",
+      "organization_address": "123 Tech Street, London, UK",
+      "organization_email": "dpo@techcorp.com",
+      "organization_phone": "+44 20 1234 5678",
+      "data_administrator_name": "John Smith",
+      "data_controller_name": "Jane Doe",
+      "request_type": "SAR",
+      "request_description": "Request for all personal data held by Tech Corp Ltd",
+      "submission_date": "2024-08-01",
+      "submission_method": "Email",
+      "statutory_deadline": "2024-09-01",
+      "status": "Pending",
+      "response_received": false,
+      "data_provided": false,
+      "data_complete": false,
+      "created_at": "2024-08-01T10:00:00Z",
+      "updated_at": "2024-08-01T10:00:00Z"
+    },
+    {
+      "id": 2,
+      "case_reference": "SAR-2024-002",
+      "organization_name": "Data Solutions Inc",
+      "organization_address": "456 Data Avenue, Manchester, UK",
+      "organization_email": "privacy@datasolutions.com",
+      "organization_phone": "+44 16 1234 5678",
+      "data_administrator_name": "Sarah Johnson",
+      "data_controller_name": "Mike Wilson",
+      "request_type": "FOIA",
+      "request_description": "Freedom of Information request for public records",
+      "submission_date": "2024-08-05",
+      "submission_method": "Online Form",
+      "statutory_deadline": "2024-09-05",
+      "status": "In Progress",
+      "response_received": false,
+      "data_provided": false,
+      "data_complete": false,
+      "created_at": "2024-08-05T14:30:00Z",
+      "updated_at": "2024-08-05T14:30:00Z"
+    }
+  ],
+  "settings": {
+    "default_deadline_days": 30,
+    "reminder_days_before": 7,
+    "auto_extensions": true
+  }
+}
