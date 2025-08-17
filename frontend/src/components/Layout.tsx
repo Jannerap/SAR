@@ -21,11 +21,11 @@ const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'SAR Cases', href: '/cases', icon: FileText },
-    { name: 'New Case', href: '/cases/new', icon: Plus },
-    { name: 'Calendar', href: '/calendar', icon: Calendar },
-    { name: 'Reports', href: '/reports', icon: BarChart3 },
+    { name: 'Dashboard', href: './dashboard', icon: Home },
+    { name: 'SAR Cases', href: './cases', icon: FileText },
+    { name: 'New Case', href: './cases/new', icon: Plus },
+    { name: 'Calendar', href: './calendar', icon: Calendar },
+    { name: 'Reports', href: './reports', icon: BarChart3 },
   ];
 
   const handleLogout = () => {
@@ -34,10 +34,12 @@ const Layout: React.FC = () => {
   };
 
   const isActive = (href: string) => {
-    if (href === '/dashboard') {
-      return location.pathname === '/dashboard';
+    // Remove the ./ prefix for comparison
+    const cleanHref = href.replace('./', '');
+    if (cleanHref === 'dashboard') {
+      return location.pathname.endsWith('/dashboard') || location.pathname.endsWith('/SAR/dashboard');
     }
-    return location.pathname.startsWith(href);
+    return location.pathname.includes(cleanHref);
   };
 
   return (

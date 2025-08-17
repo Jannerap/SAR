@@ -31,7 +31,9 @@ axios.interceptors.response.use(
     if (error.response?.status === 401 || error.response?.status === 403) {
       // Token expired or invalid, clear it
       localStorage.removeItem('token');
-      window.location.href = '/login';
+      // Use relative path for GitHub Pages compatibility
+      const basePath = window.location.pathname.includes('/SAR') ? '/SAR' : '';
+      window.location.href = `${basePath}/login`;
     }
     return Promise.reject(error);
   }
