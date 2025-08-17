@@ -50,7 +50,8 @@ jobs:
       working-directory: ./frontend
       run: |
         echo "Starting build process..."
-        npm run build
+        echo "Building with PUBLIC_URL=/SAR for GitHub Pages subdirectory..."
+        PUBLIC_URL=/SAR npm run build
         echo "Build completed successfully"
         
     - name: Verify build output

@@ -14,9 +14,12 @@ import ProtectedRoute from './components/ProtectedRoute';
 import './index.css';
 
 function App() {
+  // Get the base path for GitHub Pages subdirectory
+  const basename = process.env.NODE_ENV === 'production' ? '/SAR' : '';
+  
   return (
     <AuthProvider>
-      <Router>
+      <Router basename={basename}>
         <div className="App">
           <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />

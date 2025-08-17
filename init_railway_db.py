@@ -17,12 +17,12 @@ def create_admin_user():
         "username": "admin",
         "email": "admin@sar-system.com",
         "full_name": "System Administrator",
-        "password": "admin123",
-        "is_admin": True
+        "password": "admin123"
     }
     
     try:
-        response = requests.post(f"{RAILWAY_URL}/auth/register", json=admin_data)
+        # Use form-encoded data as required by the API
+        response = requests.post(f"{RAILWAY_URL}/auth/register", data=admin_data)
         if response.status_code == 200:
             print("✅ Admin user created successfully!")
             return True
