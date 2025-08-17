@@ -993,34 +993,44 @@ Date: {current_date}
     
     return letter_content.encode('utf-8')
 
-# @app.get("/reports/initial-sar/{sar_id}")
-# async def generate_initial_sar_request(
-#     sar_id: int,
-#     current_user: User = Depends(get_current_user)
-# ):
-#     """Generate initial SAR request letter as PDF."""
-#     try:
-#         # Get the SAR case
-#         sar_case = get_sar_case_db(sar_id, current_user.id)
-#         if not sar_case:
-#             raise HTTPException(status_code=404, detail="SAR case not found")
+@app.post("/init-db")
+async def initialize_database():
+    """Initialize database and create admin user."""
+    try:
+        from app.database import engine, Base
+        from app.models import User
+        from app.auth import get_password_hash
+        from sqlalchemy.orm import Session
         
-#         # Generate the initial SAR request letter
-#         pdf_content = generate_initial_sar_letter(sar_case)
+        # Create tables
+        Base.metadata.create_all(bind=engine)
         
-#         return Response(
-#             content=pdf_content,
-#             media_type="application/pdf",
-#             headers={
-#                 "Content-Disposition": f"attachment; filename=initial-sar-request-{sar_case.case_reference}.pdf"
-#             }
-#         )
-#     except Exception as e:
-#         print(f"Error generating initial SAR request: {str(e)}")
-#         raise HTTPException(
-#             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-#             detail=f"Failed to generate initial SAR request: {str(e)}"
-#         )
+        # Create admin user if it doesn't exist
+        db = Session(engine)
+        try:
+            admin_user = db.query(User).filter(User.username == "admin").first()
+            if not admin_user:
+                admin_user = User(
+                    username="admin",
+                    email="admin@sar-system.com",
+                    full_name="System Administrator",
+                    hashed_password=get_password_hash("admin123"),
+                    is_admin=True
+                )
+                db.add(admin_user)
+                db.commit()
+                return {"message": "Database initialized successfully. Admin user created: admin/admin123"}
+            else:
+                return {"message": "Database already initialized. Admin user exists: admin/admin123"}
+        finally:
+            db.close()
+            
+    except Exception as e:
+        print(f"Database initialization error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Database initialization failed: {str(e)}"
+        )
 
 if __name__ == "__main__":
     import uvicorn
