@@ -2,6 +2,7 @@ import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import SARCases from './pages/SARCases';
@@ -23,37 +24,58 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={
               <ProtectedRoute>
-                <Dashboard />
+                <Layout>
+                  <Dashboard />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/cases" element={
               <ProtectedRoute>
-                <SARCases />
+                <Layout>
+                  <SARCases />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/cases/new" element={
               <ProtectedRoute>
-                <NewCase />
+                <Layout>
+                  <NewCase />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/cases/:id" element={
               <ProtectedRoute>
-                <CaseDetail />
+                <Layout>
+                  <CaseDetail />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/calendar" element={
               <ProtectedRoute>
-                <Calendar />
+                <Layout>
+                  <Calendar />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/reports" element={
               <ProtectedRoute>
-                <Reports />
+                <Layout>
+                  <Reports />
+                </Layout>
+              </ProtectedRoute>
+            } />
+            <Route path="/user-report" element={
+              <ProtectedRoute>
+                <Layout>
+                  <Reports />
+                </Layout>
               </ProtectedRoute>
             } />
             <Route path="/settings" element={
               <ProtectedRoute>
-                <Settings />
+                <Layout>
+                  <Settings />
+                </Layout>
               </ProtectedRoute>
             } />
           </Routes>
