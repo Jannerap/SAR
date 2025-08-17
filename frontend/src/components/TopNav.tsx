@@ -49,7 +49,7 @@ const TopNav: React.FC = () => {
               </div>
             </div>
             <div className="ml-3">
-              <h1 className="text-xl font-bold text-gray-900">SAR Tracker</h1>
+              <h1 className="text-xl font-bold text-gray-900">SAR Tracker v2.0</h1>
             </div>
           </div>
 
@@ -94,7 +94,7 @@ const TopNav: React.FC = () => {
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="hidden md:flex items-center px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+              className="hidden md:flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-md transition-colors border border-red-200"
             >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
