@@ -8,7 +8,6 @@ import {
   CheckCircle, 
   Clock,
   TrendingUp,
-  Users,
   Building
 } from 'lucide-react';
 import axios from 'axios';

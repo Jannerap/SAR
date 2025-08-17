@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-// Configure axios base URL based on environment
-const isDevelopment = process.env.NODE_ENV === 'development';
-const API_BASE_URL = isDevelopment ? 'http://localhost:8000' : 'https://your-backend-domain.com';
+// Note: API_BASE_URL is configured in axios defaults when needed
 
 // Set up axios interceptor for authentication
 axios.interceptors.request.use(

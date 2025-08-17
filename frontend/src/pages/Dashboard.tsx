@@ -6,7 +6,6 @@ import {
   Clock,
   AlertTriangle,
   CheckCircle,
-  TrendingUp,
   Plus,
   Calendar,
   BarChart3,
@@ -107,20 +106,7 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'pending':
-        return 'text-warning-600 bg-warning-100';
-      case 'overdue':
-        return 'text-danger-600 bg-danger-100';
-      case 'complete':
-        return 'text-success-600 bg-success-100';
-      case 'escalated':
-        return 'text-purple-600 bg-purple-100';
-      default:
-        return 'text-gray-600 bg-gray-100';
-    }
-  };
+
 
   const getDeadlineColor = (daysRemaining: number, isOverdue: boolean) => {
     if (isOverdue) return 'text-danger-600 bg-danger-100';

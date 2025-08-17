@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Calendar as CalendarIcon, Plus, AlertTriangle, CheckCircle, Clock, FileText } from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, AlertTriangle, Clock, FileText } from 'lucide-react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
 
 interface CalendarEvent {
   id: number;
@@ -27,8 +26,6 @@ const Calendar: React.FC = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [showEventModal, setShowEventModal] = useState(false);
 
   useEffect(() => {
     fetchCalendarEvents();
@@ -189,7 +186,6 @@ const Calendar: React.FC = () => {
     const month = currentDate.getMonth();
     
     const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
     const startDate = new Date(firstDay);
     startDate.setDate(startDate.getDate() - firstDay.getDay());
     
@@ -315,7 +311,6 @@ const Calendar: React.FC = () => {
           <p className="text-gray-600 mt-1">Track deadlines, reminders, and important dates</p>
         </div>
         <button
-          onClick={() => setShowEventModal(true)}
           className="btn-primary flex items-center"
         >
           <Plus className="w-4 h-4 mr-2" />
@@ -384,7 +379,7 @@ const Calendar: React.FC = () => {
                     <div
                       key={event.id}
                       className={`text-xs p-1 rounded border ${getEventTypeColor(event.type)} ${getPriorityColor(event.priority)} cursor-pointer hover:opacity-80 transition-opacity`}
-                      onClick={() => setSelectedDate(day.date)}
+
                     >
                       <div className="flex items-center space-x-1">
                         {getEventTypeIcon(event.type)}
