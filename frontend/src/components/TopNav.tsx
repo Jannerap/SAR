@@ -10,11 +10,12 @@ import {
   User,
   LogOut,
   Menu,
-  X
+  X,
+  Download
 } from 'lucide-react';
 
 const TopNav: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, localData } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,6 +35,57 @@ const TopNav: React.FC = () => {
     console.log('Logout clicked'); // Debug log
     logout();
     navigate('/login');
+  };
+
+  const handleSaveToJSON = async () => {
+    try {
+      // Get current data from the backend
+      const response = await fetch('https://web-production-055e.up.railway.app/sar/', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch data');
+      }
+      
+      const sarCases = await response.json();
+      
+      // Create export data structure
+      const exportData = {
+        metadata: {
+          version: "1.0.0",
+          created: new Date().toISOString(),
+          description: "SAR data exported from online mode",
+          exported_by: user?.username || 'admin',
+          total_cases: sarCases.length
+        },
+        sar_cases: sarCases,
+        settings: {
+          default_deadline_days: 30,
+          reminder_days_before: 7,
+          auto_extensions: true
+        }
+      };
+      
+      // Create and download the file
+      const dataStr = JSON.stringify(exportData, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(dataBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `sar-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+      
+      console.log('Data exported successfully');
+    } catch (error) {
+      console.error('Export failed:', error);
+      alert('Failed to export data. Please try again.');
+    }
   };
 
   const isActive = (href: string) => {
@@ -84,6 +136,16 @@ const TopNav: React.FC = () => {
 
           {/* User Menu and Mobile Menu Button */}
           <div className="flex items-center space-x-4">
+            {/* Save to JSON Button */}
+            <button
+              onClick={handleSaveToJSON}
+              className="hidden md:flex items-center px-3 py-2 text-sm font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors border border-green-200"
+              title="Export current data as JSON for local mode"
+            >
+              <Download className="w-4 h-4 mr-2" />
+              Save to JSON
+            </button>
+
             {/* User Info */}
             <div className="hidden md:flex items-center space-x-3">
               <div className="flex-shrink-0">
@@ -147,6 +209,18 @@ const TopNav: React.FC = () => {
                 </button>
               );
             })}
+            
+            {/* Mobile Save to JSON Button */}
+            <button
+              onClick={() => {
+                handleSaveToJSON();
+                setIsMobileMenuOpen(false);
+              }}
+              className="w-full flex items-center px-3 py-2 text-base font-medium text-green-600 hover:text-green-700 hover:bg-green-50 rounded-md transition-colors border border-green-200"
+            >
+              <Download className="w-5 h-5 mr-3" />
+              Save to JSON
+            </button>
             
             {/* Mobile User Info */}
             <div className="pt-4 border-t border-gray-200">
