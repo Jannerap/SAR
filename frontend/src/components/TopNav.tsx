@@ -19,6 +19,8 @@ const TopNav: React.FC = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  console.log('TopNav rendering with user:', user); // Debug log
+
   const navigation = [
     { name: 'Dashboard', href: '/dashboard', icon: Home },
     { name: 'SAR Cases', href: '/cases', icon: FileText },
@@ -29,6 +31,7 @@ const TopNav: React.FC = () => {
   ];
 
   const handleLogout = () => {
+    console.log('Logout clicked'); // Debug log
     logout();
     navigate('/login');
   };
@@ -37,8 +40,13 @@ const TopNav: React.FC = () => {
     return location.pathname === href;
   };
 
+  // Force re-render to ensure component is visible
+  React.useEffect(() => {
+    console.log('TopNav mounted and visible');
+  }, []);
+
   return (
-    <div className="bg-white shadow-sm border-b border-gray-200">
+    <div className="bg-white shadow-sm border-b border-gray-200" style={{ zIndex: 1000 }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo and Brand */}
@@ -49,7 +57,7 @@ const TopNav: React.FC = () => {
               </div>
             </div>
             <div className="ml-3">
-              <h1 className="text-xl font-bold text-gray-900">SAR Tracker v2.1</h1>
+              <h1 className="text-xl font-bold text-gray-900">SAR Tracker v2.2</h1>
             </div>
           </div>
 
@@ -85,9 +93,9 @@ const TopNav: React.FC = () => {
               </div>
               <div className="text-sm">
                 <p className="font-medium text-gray-900">
-                  {user?.full_name || user?.username}
+                  {user?.full_name || user?.username || 'User'}
                 </p>
-                <p className="text-gray-500">{user?.email}</p>
+                <p className="text-gray-500">{user?.email || 'user@example.com'}</p>
               </div>
             </div>
 
@@ -150,9 +158,9 @@ const TopNav: React.FC = () => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm font-medium text-gray-900">
-                    {user?.full_name || user?.username}
+                    {user?.full_name || user?.username || 'User'}
                   </p>
-                  <p className="text-xs text-gray-500">{user?.email}</p>
+                  <p className="text-xs text-gray-500">{user?.email || 'user@example.com'}</p>
                 </div>
               </div>
               
