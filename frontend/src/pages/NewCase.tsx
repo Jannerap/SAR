@@ -65,7 +65,15 @@ const NewCase: React.FC = () => {
     try {
       const response = await axios.post('/sar/', formData);
       toast.success('SAR case created successfully!');
-      navigate(`./cases/${response.data.id}`);
+      
+      // Ask user where they want to go
+      if (window.confirm('Case created successfully! Would you like to go to the new case or return to the dashboard?')) {
+        // Navigate to the newly created case
+        navigate(`/cases/${response.data.id}`);
+      } else {
+        // Navigate back to dashboard
+        navigate('/dashboard');
+      }
     } catch (error: any) {
       console.error('Error creating case:', error);
       const errorMessage = error.response?.data?.detail || 'Failed to create case';
