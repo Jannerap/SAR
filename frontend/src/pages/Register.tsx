@@ -36,7 +36,7 @@ const Register: React.FC = () => {
       // For now, we'll redirect to login since registration endpoint might not be available
       // In a full system, you would call a registration API here
       toast.success('Registration successful! Please log in.');
-      navigate('/login');
+      navigate('./login');
     } catch (error) {
       console.error('Registration error:', error);
       toast.error('Registration failed. Please try again.');
@@ -65,7 +65,7 @@ const Register: React.FC = () => {
           <p className="mt-2 text-center text-sm text-gray-600">
             Or{' '}
             <button
-              onClick={() => navigate('/login')}
+              onClick={() => navigate('./login')}
               className="font-medium text-primary-600 hover:text-primary-500"
             >
               sign in to your existing account
