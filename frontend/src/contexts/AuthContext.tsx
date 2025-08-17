@@ -5,7 +5,7 @@ import axios from 'axios';
 const isDevelopment = process.env.NODE_ENV === 'development';
 const API_BASE_URL = isDevelopment 
   ? 'http://localhost:8000' 
-  : 'https://your-railway-app-name.railway.app'; // We'll update this after deployment
+  : 'https://web-production-055e.up.railway.app'; // Your Railway backend
 
 // Set axios base URL
 axios.defaults.baseURL = API_BASE_URL;
