@@ -1,10 +1,14 @@
-import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import React, { ReactNode } from 'react';
 import TopNav from './TopNav';
 import { useAuth } from '../contexts/AuthContext';
 import { Home, FileText, Plus, Calendar, BarChart3, User, LogOut } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-const Layout: React.FC = () => {
+interface LayoutProps {
+  children: ReactNode;
+}
+
+const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -86,7 +90,7 @@ const Layout: React.FC = () => {
       {/* Main Content */}
       <main className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Outlet />
+          {children}
         </div>
       </main>
     </div>
