@@ -107,7 +107,7 @@ const NewCase: React.FC = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-4">
           <button
-            onClick={() => navigate('./cases')}
+            onClick={() => navigate('/cases')}
             className="btn-secondary flex items-center"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
@@ -452,7 +452,7 @@ const NewCase: React.FC = () => {
           <div className="flex justify-end space-x-3">
                           <button
                 type="button"
-                onClick={() => navigate('./cases')}
+                onClick={() => navigate('/cases')}
                 className="btn-secondary"
               >
                 Cancel

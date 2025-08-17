@@ -21,16 +21,16 @@ const Layout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const navigation = [
-    { name: 'Dashboard', href: './dashboard', icon: Home },
-    { name: 'SAR Cases', href: './cases', icon: FileText },
-    { name: 'New Case', href: './cases/new', icon: Plus },
-    { name: 'Calendar', href: './calendar', icon: Calendar },
-    { name: 'Reports', href: './reports', icon: BarChart3 },
+    { name: 'Dashboard', href: '/dashboard', icon: Home },
+    { name: 'SAR Cases', href: '/cases', icon: FileText },
+    { name: 'New Case', href: '/cases/new', icon: Plus },
+    { name: 'Calendar', href: '/calendar', icon: Calendar },
+    { name: 'Reports', href: '/reports', icon: BarChart3 },
   ];
 
   const handleLogout = () => {
     logout();
-            navigate('./login');
+            navigate('/login');
   };
 
   const isActive = (href: string) => {
@@ -106,7 +106,7 @@ const Layout: React.FC = () => {
                 href="/user-report"
                 onClick={(e) => {
                   e.preventDefault();
-                  navigate('./user-report');
+                  navigate('/user-report');
                   setSidebarOpen(false);
                 }}
                 className={`group flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${

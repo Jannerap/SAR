@@ -16,7 +16,7 @@ const Login: React.FC = () => {
 
   React.useEffect(() => {
     if (isAuthenticated) {
-      navigate('./dashboard');
+      navigate('/dashboard');
     }
   }, [isAuthenticated, navigate]);
 
@@ -27,7 +27,7 @@ const Login: React.FC = () => {
 
     try {
       await login(username, password);
-      navigate('./dashboard');
+      navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Login failed. Please try again.');
     } finally {
@@ -163,7 +163,7 @@ const Login: React.FC = () => {
 
               <div className="mt-6">
                 <button
-                  onClick={() => navigate('./register')}
+                  onClick={() => navigate('/register')}
                   className="w-full flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
                   Create an account
