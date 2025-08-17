@@ -1,0 +1,80 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2025-01-17",
+    "description": "Sample SAR data template - customize this file with your own cases"
+  },
+  "sar_cases": [
+    {
+      "id": 1,
+      "case_reference": "SAR-202501-001",
+      "organization_name": "Example Company Ltd",
+      "organization_email": "dpo@examplecompany.com",
+      "organization_phone": "+44 20 1234 5678",
+      "organization_address": "123 Business Street, London, SW1A 1AA",
+      "data_administrator_name": "John Smith",
+      "data_controller_name": "Jane Doe",
+      "request_type": "personal_data",
+      "request_description": "Request for all personal data held about me",
+      "submission_date": "2025-01-15",
+      "statutory_deadline": "2025-02-14",
+      "custom_deadline": null,
+      "extended_deadline": null,
+      "status": "Pending",
+      "urgency": "Medium",
+      "data_volume": "Unknown",
+      "special_considerations": "None",
+      "notes": "Initial request submitted via email",
+      "case_updates": [
+        {
+          "id": 1,
+          "update_type": "Correspondence",
+          "correspondence_date": "2025-01-15",
+          "title": "Initial Request Submitted",
+          "description": "SAR request submitted via email to DPO",
+          "created_at": "2025-01-15T10:00:00Z"
+        }
+      ],
+      "files": [],
+      "reminders": []
+    },
+    {
+      "id": 2,
+      "case_reference": "SAR-202501-002",
+      "organization_name": "Another Organization",
+      "organization_email": "privacy@anotherorg.org",
+      "organization_phone": "+44 20 9876 5432",
+      "organization_address": "456 Corporate Avenue, Manchester, M1 1AA",
+      "data_administrator_name": "Sarah Johnson",
+      "data_controller_name": "Mike Wilson",
+      "request_type": "special_categories",
+      "request_description": "Request for special category data including health records",
+      "submission_date": "2025-01-10",
+      "statutory_deadline": "2025-02-09",
+      "custom_deadline": null,
+      "extended_deadline": null,
+      "status": "Pending",
+      "urgency": "High",
+      "data_volume": "Large",
+      "special_considerations": "Health data involved",
+      "notes": "Complex request involving multiple data sources",
+      "case_updates": [
+        {
+          "id": 1,
+          "update_type": "Correspondence",
+          "correspondence_date": "2025-01-10",
+          "title": "Initial Request Submitted",
+          "description": "SAR request submitted via registered post",
+          "created_at": "2025-01-10T14:30:00Z"
+        }
+      ],
+      "files": [],
+      "reminders": []
+    }
+  ],
+  "settings": {
+    "default_deadline_days": 28,
+    "reminder_days_before": 7,
+    "auto_extensions": false
+  }
+}

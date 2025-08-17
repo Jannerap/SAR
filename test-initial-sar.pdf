@@ -1,0 +1,1 @@
+{"detail":"Failed to generate initial SAR request: Parent instance <SARCase at 0x104fe6e40> is not bound to a Session; lazy load operation of attribute 'user' cannot proceed (Background on this error at: https://sqlalche.me/e/20/bhk3)"}
