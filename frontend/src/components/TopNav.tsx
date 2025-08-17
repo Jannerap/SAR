@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 
 const TopNav: React.FC = () => {
-  const { user, logout, localData } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
