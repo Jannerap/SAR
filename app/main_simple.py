@@ -30,7 +30,12 @@ app = FastAPI(
 # CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:8000"],
+    allow_origins=[
+        "http://localhost:3000", 
+        "http://localhost:8000",
+        "https://jannerap.github.io",
+        "https://jannerap.github.io/SAR"
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -42,6 +47,11 @@ security = HTTPBearer()
 # Mount static files for uploads
 os.makedirs("uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint for Railway deployment."""
+    return {"status": "healthy", "timestamp": datetime.now().isoformat()}
 
 # Add this function for debugging
 async def get_current_user_debug(

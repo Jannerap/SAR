@@ -1,7 +1,14 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import axios from 'axios';
 
-// Note: API_BASE_URL is configured in axios defaults when needed
+// Configure API base URL based on environment
+const isDevelopment = process.env.NODE_ENV === 'development';
+const API_BASE_URL = isDevelopment 
+  ? 'http://localhost:8000' 
+  : 'https://your-railway-app-name.railway.app'; // We'll update this after deployment
+
+// Set axios base URL
+axios.defaults.baseURL = API_BASE_URL;
 
 // Set up axios interceptor for authentication
 axios.interceptors.request.use(
