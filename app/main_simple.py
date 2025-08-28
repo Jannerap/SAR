@@ -7,6 +7,8 @@ import os
 from datetime import datetime, timedelta, date
 from typing import Optional, List
 import json
+import io
+import zipfile
 
 from app.database import engine, Base
 from app.models import *
@@ -992,6 +994,267 @@ Date: {current_date}
 """
     
     return letter_content.encode('utf-8')
+
+# ------------------------
+# ICO Escalation Endpoints
+# ------------------------
+
+def generate_ico_letter_content(sar_case, updates, user):
+    """Generate ICO complaint letter content as bytes."""
+    current_date = datetime.now().strftime("%B %d, %Y")
+
+    # Build simple timeline text
+    timeline_lines = []
+    for u in updates or []:
+        created_str = u.created_at.strftime('%Y-%m-%d') if getattr(u, 'created_at', None) else ''
+        timeline_lines.append(f"- {created_str} [{u.update_type}] {u.title}: {u.content}")
+    timeline_text = "\n".join(timeline_lines) if timeline_lines else "(No communications recorded)"
+
+    overdue_basis = "28 days"  # Default; frontend may set custom/extended deadlines
+
+    letter = f"""Dear ICO,
+
+I am writing to escalate a Subject Access Request submitted to {sar_case.organization_name} on {sar_case.submission_date.strftime('%d %B %Y') if sar_case.submission_date else 'N/A'}. To date, they have failed to respond within the statutory period ({overdue_basis}) and have not provided legal grounds for delay.
+
+Organisation: {sar_case.organization_name}
+Case Reference: {sar_case.case_reference}
+
+Summary of issue:
+- The organisation has not provided a full response to my SAR.
+- I have followed up but have not received a compliant response within time.
+
+Timeline of communications:
+{timeline_text}
+
+I request a formal investigation into their compliance under UK GDPR (Article 15) and the Data Protection Act 2018. Evidence is attached.
+
+Yours sincerely,
+{user.full_name or user.username}
+Date: {current_date}
+"""
+
+    return letter.encode('utf-8')
+
+@app.post("/sar/{sar_id}/ico/escalate")
+async def escalate_to_ico(
+    sar_id: int,
+    request: Request,
+    current_user: User = Depends(get_current_user)
+):
+    """Create an ICO escalation record and mark the SAR case as Escalated."""
+    try:
+        # Parse JSON body
+        body = await request.body()
+        if not body:
+            raise HTTPException(status_code=400, detail="Request body is empty")
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON")
+
+        # Validate and parse dates/fields
+        escalation_date_str = data.get("escalation_date")
+        if not escalation_date_str:
+            raise HTTPException(status_code=400, detail="escalation_date is required (YYYY-MM-DD)")
+        try:
+            escalation_date_parsed = datetime.strptime(escalation_date_str, "%Y-%m-%d").date()
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid escalation_date format")
+
+        escalation_reason = data.get("escalation_reason") or "Breach of SAR statutory response time"
+        escalation_method = data.get("escalation_method") or "Online Form"
+        ico_reference = data.get("ico_reference")
+        ico_investigation_deadline = None
+        if data.get("ico_investigation_deadline"):
+            try:
+                ico_investigation_deadline = datetime.strptime(data.get("ico_investigation_deadline"), "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid ico_investigation_deadline format")
+        ico_decision_deadline = None
+        if data.get("ico_decision_deadline"):
+            try:
+                ico_decision_deadline = datetime.strptime(data.get("ico_decision_deadline"), "%Y-%m-%d").date()
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid ico_decision_deadline format")
+
+        # Build data object compatible with CRUD
+        escalation_data = type('obj', (object,), {
+            'escalation_date': escalation_date_parsed,
+            'escalation_reason': escalation_reason,
+            'escalation_method': escalation_method,
+            'ico_reference': ico_reference,
+            'ico_investigation_deadline': ico_investigation_deadline,
+            'ico_decision_deadline': ico_decision_deadline
+        })()
+
+        # Create record
+        created = create_ico_escalation_db(sar_id, escalation_data, current_user.id)
+        return created
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"ICO escalation error: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create ICO escalation: {str(e)}"
+        )
+
+@app.get("/sar/{sar_id}/ico/draft")
+async def get_ico_draft(
+    sar_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Return autogenerated ICO complaint draft text."""
+    sar_case = get_sar_case_db(sar_id, current_user.id)
+    if not sar_case:
+        raise HTTPException(status_code=404, detail="SAR case not found")
+    updates = get_case_updates_db(sar_id, current_user.id)
+    content = generate_ico_letter_content(sar_case, updates, current_user)
+    return Response(content=content, media_type="text/plain")
+
+@app.get("/sar/{sar_id}/ico/letter")
+async def get_ico_letter(
+    sar_id: int,
+    format: str = "pdf",
+    current_user: User = Depends(get_current_user)
+):
+    """Generate ICO complaint letter in PDF or TXT."""
+    sar_case = get_sar_case_db(sar_id, current_user.id)
+    if not sar_case:
+        raise HTTPException(status_code=404, detail="SAR case not found")
+    updates = get_case_updates_db(sar_id, current_user.id)
+
+    if format.lower() == "pdf":
+        try:
+            from reportlab.lib.pagesizes import letter as letter_pagesize
+            from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
+            from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+            from io import BytesIO
+
+            buffer = BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter_pagesize)
+            story = []
+            styles = getSampleStyleSheet()
+
+            title_style = ParagraphStyle('ICOTitle', parent=styles['Heading1'], fontSize=16, spaceAfter=20, alignment=1)
+            normal_style = ParagraphStyle('Normal', parent=styles['Normal'], fontSize=11, spaceAfter=6)
+
+            story.append(Paragraph("ICO COMPLAINT LETTER", title_style))
+            story.append(Spacer(1, 20))
+
+            # Compose content
+            body_text = generate_ico_letter_content(sar_case, updates, current_user).decode('utf-8')
+            for line in body_text.split("\n"):
+                story.append(Paragraph(line or " ", normal_style))
+
+            doc.build(story)
+            buffer.seek(0)
+            return Response(
+                content=buffer.getvalue(),
+                media_type="application/pdf",
+                headers={"Content-Disposition": f"attachment; filename={sar_case.case_reference}-ICO-Letter.pdf"}
+            )
+        except Exception as e:
+            print(f"ICO PDF generation failed, falling back to text: {e}")
+            # fall through to text response
+
+    # TXT fallback
+    content = generate_ico_letter_content(sar_case, updates, current_user)
+    return Response(
+        content=content,
+        media_type="text/plain",
+        headers={"Content-Disposition": f"attachment; filename={sar_case.case_reference}-ICO-Letter.txt"}
+    )
+
+@app.get("/sar/{sar_id}/ico/bundle")
+async def get_ico_bundle(
+    sar_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """Create a ZIP bundle including ICO complaint, timeline, evidence summary, and attachments."""
+    try:
+        sar_case = get_sar_case_db(sar_id, current_user.id)
+        if not sar_case:
+            raise HTTPException(status_code=404, detail="SAR case not found")
+
+        updates = get_case_updates_db(sar_id, current_user.id)
+        files = get_case_files_db(sar_id, current_user.id)
+
+        memfile = io.BytesIO()
+        with zipfile.ZipFile(memfile, mode='w', compression=zipfile.ZIP_DEFLATED) as zf:
+            # Complaint letter (txt)
+            complaint_txt = generate_ico_letter_content(sar_case, updates, current_user)
+            zf.writestr("complaint-letter.txt", complaint_txt)
+
+            # Timeline CSV
+            csv_lines = ["date,update_type,title,content"]
+            for u in updates or []:
+                created_str = u.created_at.strftime('%Y-%m-%d %H:%M:%S') if getattr(u, 'created_at', None) else ''
+                # escape commas/newlines
+                title = (u.title or '').replace('\n', ' ').replace(',', ';')
+                content = (u.content or '').replace('\n', ' ').replace(',', ';')
+                csv_lines.append(f"{created_str},{u.update_type},{title},{content}")
+            zf.writestr("timeline.csv", "\n".join(csv_lines))
+
+            # Evidence summary HTML
+            html_lines = [
+                "<html><head><meta charset='utf-8'><title>Evidence Summary</title></head><body>",
+                f"<h1>Evidence Summary for {sar_case.case_reference}</h1>",
+                "<ul>"
+            ]
+            for f in files or []:
+                html_lines.append(f"<li>{f.filename} ({f.file_type}, {f.file_size} bytes)</li>")
+            html_lines.append("</ul></body></html>")
+            zf.writestr("evidence-summary.html", "\n".join(html_lines).encode('utf-8'))
+
+            # Attachments
+            for f in files or []:
+                try:
+                    # Read from stored file path
+                    if f.file_path and os.path.exists(f.file_path):
+                        with open(f.file_path, 'rb') as fh:
+                            data = fh.read()
+                        # Place into attachments folder with original or stored filename
+                        name = os.path.basename(f.file_path) or f.filename
+                        zf.writestr(f"attachments/{name}", data)
+                except Exception as fe:
+                    print(f"Failed to add attachment {getattr(f, 'file_path', None)}: {fe}")
+
+        memfile.seek(0)
+        filename = f"ico-escalation-{sar_case.organization_name.replace(' ', '')}-{datetime.now().strftime('%Y-%m-%d')}.zip"
+        return Response(
+            content=memfile.getvalue(),
+            media_type="application/zip",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"ICO bundle generation error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to generate ICO bundle: {str(e)}"
+        )
+
+@app.get("/sar/{sar_id}/ico")
+async def list_case_ico_escalations(
+    sar_id: int,
+    current_user: User = Depends(get_current_user)
+):
+    """List ICO escalations for a specific SAR case."""
+    from app.database import SessionLocal
+    db = SessionLocal()
+    try:
+        # Ensure case belongs to user
+        sar_case = db.query(SARCase).filter(SARCase.id == sar_id, SARCase.user_id == current_user.id).first()
+        if not sar_case:
+            raise HTTPException(status_code=404, detail="SAR case not found")
+        escalations = db.query(ICOEscalation).filter(ICOEscalation.sar_case_id == sar_id, ICOEscalation.user_id == current_user.id).order_by(ICOEscalation.created_at.desc()).all()
+        return escalations
+    finally:
+        db.close()
 
 @app.post("/init-db")
 async def initialize_database():
